@@ -1,0 +1,4 @@
+*.o
+sv_client
+sv_server
+tcp_server
