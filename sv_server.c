@@ -7,11 +7,13 @@
 #include <stdlib.h>
 #include <time.h>
 
+
 void write_file(char *buf){
     FILE *f;
-    f = fopen("./txt/sv_log.txt", "a");
-    fwrite(buf, sizeof(buf), sizeof(buf), f);
-    fwrite("\n",sizeof(char), 1, f);
+    f = fopen("./txt/sv_log.txt", "a"); 
+
+    fwrite(buf, sizeof(char), strlen(buf), f);
+    // fwrite("\n", 1,sizeof(char), f);
     fclose(f);
 }
 
@@ -21,7 +23,7 @@ void write_log(char *buf, char *buf_ip){
     localtime_r(&now, &tm_now) ;
     char buf_time[100] ;
     strftime(buf_time, sizeof(buf_time), "%Y-%m-%d %H:%M ", &tm_now);
-    char buffer[512];
+    char buffer[2048];
     strcpy(buffer, buf_ip);
     strcat(buffer, buf_time);
     strcat(buffer, buf);
@@ -62,6 +64,8 @@ int main(){
 
     char buf[256];
     char buf_ip[256] = "127.0.0.1 ";
+    FILE *f;
+    f = fopen("./txt/sv_log.txt", "a");
     while (1)
     {   
         
@@ -74,8 +78,8 @@ int main(){
         if (ret < sizeof(buf))
             buf[ret] = 0;
         write_log(buf, buf_ip);
-        // puts(buf);
     }
+    // fclose(f);
     close(client);
     close(listener);
 }

@@ -54,7 +54,6 @@ int main(int argc, char *argv[]){
 
         printf("\nNhap diem TB: ");
         fgets(point, sizeof(point), stdin);
-        point[strlen(point)-1] = '\0';
 
         char buffer[512];
         strcpy(buffer, mssv);
