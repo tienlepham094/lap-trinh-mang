@@ -5,3 +5,5 @@ tcp_server
 tcp_client
 baitaptrenlop/info_client
 baitaptrenlop/info_server
+hw2/udp_file_sender
+hw2/udp_file_receiver

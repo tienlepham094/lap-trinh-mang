@@ -71,3 +71,11 @@ int main(){
         printf("%c - %hd GB\n", drive_letter, drive_size);
     }
 }
+/**
+ * Khai bao buffer nao do
+ * Khai bao 9 ki tu dau tien bat ki
+ * Su dung lenh recv de nhan luu tu ki tu thu 10
+ * Dem xem sau day xh trong buffer bn lan?
+ * Luu 9 bytes cua buffer hien tai vao dau cua no de cb cho lan nhan tiep theo
+ * 
+ */
