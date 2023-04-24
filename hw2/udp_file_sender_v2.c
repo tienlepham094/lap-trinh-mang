@@ -32,10 +32,10 @@ int main(int argc, char *argv[])
         if (res <= 0)
             break;
         strcpy(buffer, argv[3]);
-        buffer[strlen(buffer)] = '\n';
+        buffer[strlen(buffer)] = '-';
         strcat(buffer, buf);
         puts(buffer);
-        int ret = sendto(sender, buffer, strlen(buf), 0,
+        int ret = sendto(sender, buffer, strlen(buffer), 0,
                          (struct sockaddr *)&addr, sizeof(addr));
         printf("%d bytes sent\n", ret);
         usleep(10000);

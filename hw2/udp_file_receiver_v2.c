@@ -1,75 +1,64 @@
 #include <stdio.h>
+#include <stdlib.h>
 #include <string.h>
-#include <sys/socket.h>
 #include <sys/types.h>
-#include <netdb.h>
+#include <sys/socket.h>
+#include <netinet/in.h>
 #include <arpa/inet.h>
 #include <unistd.h>
-#include <stdlib.h>
 
-#define MAX_SENDERS 10
+#define MAX_LENGTH 2048
 
 int main(int argc, char *argv[])
 {
-    if(argc != 2){
-        printf("Sai tham so.\n");
-        return 1;
-    }
-    int receiver = socket(AF_INET, SOCK_DGRAM, IPPROTO_UDP);
-
-    struct sockaddr_in addr;
-    addr.sin_family = AF_INET;
-    addr.sin_addr.s_addr = htonl(INADDR_ANY);
-    addr.sin_port = htons(atoi(argv[1]));
-
-    bind(receiver, (struct sockaddr *)&addr, sizeof(addr));
-
-    // Initialize sender addresses array
-    struct sockaddr_in sender_addrs[MAX_SENDERS];
-    memset(sender_addrs, 0, sizeof(sender_addrs));
-    int num_senders = 0;
-
-    FILE *f = fopen("./txt/udp_v2.txt", "wb");
-
-    int ret;
-    // Receive data from senders
-    char buffer[2048];
-    int nread;
-    while ((nread = recvfrom(receiver, buffer,2048, 0, NULL, NULL)) > 0) {
-        // Check if sender address is already in the array
-        struct sockaddr_in sender_addr;
-        memcpy(&sender_addr, &buffer, sizeof(sender_addr));
-        int sender_idx = -1;
-        for (int i = 0; i < num_senders; i++) {
-            if (sender_addrs[i].sin_addr.s_addr == sender_addr.sin_addr.s_addr &&
-                sender_addrs[i].sin_port == sender_addr.sin_port) {
-                sender_idx = i;
-                break;
-            }
-        }
-        if (sender_idx == -1) {
-            // Add new sender address to the array
-            if (num_senders == MAX_SENDERS) {
-                fprintf(stderr, "Max number of senders reached\n");
-                continue;
-            }
-            sender_addrs[num_senders++] = sender_addr;
-            sender_idx = num_senders - 1;
-        }
-        puts(buffer);
-        // Write data to file or stdout, depending on sender index
-        if (sender_idx == 0) {
-            // First sender writes to stdout
-            fwrite(buffer + sizeof(sender_addr), 1, nread - sizeof(sender_addr), stdout);
-        } else {
-            // Other senders write to file
-        
-            fwrite(buffer + sizeof(sender_addr), 1, nread - sizeof(sender_addr), f);
-            fclose(f);
-        }
-    }
-
     
-   
-    return 1;
+
+    // Tạo socket
+    int receiver = socket(AF_INET, SOCK_DGRAM, 0);
+    if (receiver < 0)
+    {
+        perror("socket() failed");
+        exit(EXIT_FAILURE);
+    }
+
+    // Thiết lập địa chỉ server receiver
+    struct sockaddr_in server_addr;
+    memset(&server_addr, 0, sizeof(server_addr));
+    server_addr.sin_family = AF_INET;
+    server_addr.sin_addr.s_addr = htonl(INADDR_ANY);
+    server_addr.sin_port = htons(atoi(argv[1]));
+
+    // Gán địa chỉ cho socket
+    if (bind(receiver, (struct sockaddr *)&server_addr, sizeof(server_addr)) < 0)
+    {
+        perror("bind() failed");
+        exit(EXIT_FAILURE);
+    }
+
+    // Nhận nội dung file từ client sender
+    char buf[MAX_LENGTH];
+    memset(buf, 0, MAX_LENGTH);
+    int bytes_received = 0;
+    while ((bytes_received = recvfrom(receiver, buf, MAX_LENGTH, 0, NULL, NULL)) > 0)
+    {
+        printf("Received %d bytes: %s\n", bytes_received, buf);
+        
+        
+        
+        
+        FILE *fp = fopen("./txt/udp_v2.txt", "ab");
+        if (fp == NULL)
+        {
+            perror("fopen() failed");
+            exit(EXIT_FAILURE);
+        }
+        fwrite(buf, 1, strlen(buf), fp);
+        fclose(fp);
+        memset(buf, 0, MAX_LENGTH);
+    }
+
+    // Đóng socket
+    close(receiver);
+
+    return 0;
 }

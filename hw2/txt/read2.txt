@@ -1,2 +1,1 @@
-hello from sender 2
-hello halo 123
+hello from sender2
