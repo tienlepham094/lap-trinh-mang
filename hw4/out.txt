@@ -3,4 +3,6 @@ chat_server_v2.c
 file.txt
 out.txt
 telnet_server
+telnet_server_2
+telnet_server_2.c
 telnet_server.c

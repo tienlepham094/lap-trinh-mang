@@ -7,7 +7,6 @@
 #include <arpa/inet.h>
 #include <string.h>
 #include <sys/select.h>
-#include <stdlib.h>
 #include <stdbool.h>
 
 int main() 
@@ -75,7 +74,7 @@ int main()
     int num_users = 0;  // So client da dang nhap
     int users[64]; 
 
-        while (1)
+    while (1)
     {
         fdtest = fdread;
        
@@ -175,7 +174,26 @@ int main()
                             strcpy(str, buf);
                             strcat(str, " > out.txt");
 
-                            system(str);
+                            // system(str);
+                            int ret = system(str);
+                            char tmp[256];
+                            if (ret == 0)
+                            {
+                                FILE *f = fopen("out.txt", "rb");
+                                while (!feof(f))
+                                {
+                                    ret = fread(tmp, 1, sizeof(tmp), f);
+                                    if (ret <= 0)
+                                        break;
+                                    send(client, tmp, ret, 0);
+                                }
+                                fclose(f);
+                            }
+                            else
+                            {
+                                char *msg = "Lenh khong thuc hien duoc.\n";
+                                send(client, msg, strlen(msg), 0);
+                            }
                         }
                     }
                 }

@@ -152,20 +152,33 @@ int main()
                     else
                     {
                         // Da dang nhap
+                        // char sendbuf[512];
+                        // char * token = strtok(buf, ":");
+                        // if(strcmp(token,"[ca nhan]")!=0){
+                        //     sprintf(sendbuf, "%s: %s", user_ids[j], buf);
+
+                        //     for (int k = 0; k < num_users; k++)
+                        //         if (users[k] != client)
+                        //             send(users[k], sendbuf, strlen(sendbuf), 0);
+
+                        // }
+                        char target_id[32];
+                        ret = sscanf(buf, "%s", target_id);
+
                         char sendbuf[512];
-                        char * token = strtok(buf, ":");
-                        if(strcmp(token,"[ca nhan]")!=0){
-                            sprintf(sendbuf, "%s: %s", user_ids[j], buf);
+                        sprintf(sendbuf, "%s: %s", user_ids[j], buf+ strlen(target_id)+1);
 
-                            for (int k = 0; k < num_users; k++)
-                                if (users[k] != client)
+                        if(strcmp(target_id, "all")==0){
+                            for (int k = 0; k < num_users; k++){
+                                if(users[k]!=client)
                                     send(users[k], sendbuf, strlen(sendbuf), 0);
-
-                        }
-                    }   
+                            }
+                        }   
+                    }
                 }
             }
-        }
+        
     }
     return 1;
+}
 }
