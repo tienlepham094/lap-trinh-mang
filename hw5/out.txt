@@ -1,1 +1,8 @@
-fork_telnet_server  fork_telnet_server.c  out.txt  users.txt
+fork_http_server
+fork_http_server.c
+fork_telnet_server
+fork_telnet_server.c
+out.txt
+time_server
+time_server.c
+users.txt

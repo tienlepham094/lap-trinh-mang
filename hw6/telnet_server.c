@@ -6,19 +6,18 @@
 #include <netdb.h>
 #include <arpa/inet.h>
 #include <string.h>
-#include <signal.h>
 #include <sys/wait.h>
+#include <pthread.h>
 
 int users[64];
 int num_users = 0;
 
+void *client_thread(void *);
 void process_request(int client, char *buf);
 void remove_user(int client);
-void signalHandler(int signo)
-{
-    int pid = wait(NULL);
-    printf("Child %d terminated.\n", pid);
-}
+
+
+
 int main() 
 {
     int listener = socket(AF_INET, SOCK_STREAM, IPPROTO_TCP);
@@ -46,14 +45,29 @@ int main()
     }
 
     
-    signal(SIGCHLD, signalHandler);
+
     while(1){
-        if (fork() == 0)
-        {
+        
             char buf[256];
             int client = accept(listener, NULL, NULL);
             printf("New client connected: %d\n", client);
-            while (1)
+            pthread_t thread_id;
+            pthread_create(&thread_id, NULL, client_thread, &client);
+            pthread_detach(thread_id);
+        
+    }
+
+
+    close(listener); 
+
+
+    return 0;
+}
+void *client_thread(void *param)
+{
+    int client = *(int *)param;
+    char buf[256];
+while (1)
             {
                 int ret = recv(client, buf, sizeof(buf), 0);
                 if (ret <= 0){
@@ -68,17 +82,7 @@ int main()
                     process_request(client, buf);
                 }
             }
-            exit(0);
-        }
-    }
-    getchar();
-
-    close(listener); 
-    killpg(0, SIGKILL);   
-
-    return 0;
 }
-
 void process_request(int client, char *buf)
 {
     // Kiem tra trang thai dang nhap cua client
@@ -95,7 +99,7 @@ void process_request(int client, char *buf)
         if (ret == 2)
         {
             sprintf(tmp, "%s %s\n", user, pass);
-            FILE *f = fopen("users.txt", "r");
+            FILE *f = fopen("file.txt", "r");
             int found = 0;
             while (fgets(line, sizeof(line), f) != NULL)
             {
