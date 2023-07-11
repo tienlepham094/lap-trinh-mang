@@ -92,10 +92,31 @@ int main(){
             perror("connect() failed");
             return 1;
     }
-    send(ctrl_socket, "STOR ./file.txt\r\n", 15, 0);
+    char *filename = "file.txt";
+    sprintf(buf, "STOR %s\r\n", filename);
+    send(ctrl_socket, buf, strlen(buf), 0);
+
     len = recv(ctrl_socket, buf, sizeof(buf), 0);
     buf[len] = 0;
-    puts(buf);
+    printf("%s", buf);
+    FILE *file = fopen(filename, "rb");
+        if (file == NULL)
+        {
+            printf("Khong the mo file.\n");
+            return 1;
+        }
+
+        while (1)
+        {
+            int bytesRead = fread(buf, 1, sizeof(buf), file);
+            if (bytesRead <= 0)
+                break;
+
+            send(data_socket, buf, bytesRead, 0);
+        }
+
+        fclose(file);
+        close(data_socket);
 
     // Gui lenh QUIT
     send(ctrl_socket, "QUIT\r\n", 6, 0);
